@@ -1,31 +1,77 @@
+// Source: https://app.betrybe.com/course/front-end/react/components-with-state/solutions#bonus
+
 import React from 'react';
 import Pokemon from './Pokemon';
+import Button from './Button';
+import './pokedex.css';
 
 class Pokedex extends React.Component {
-  constructor() {
-    super();
-    this.state = { idx: 0 };
-    this.handleClick = this.handleClick.bind(this);
+  constructor(props) {
+    super(props);
+    this.state = {
+      idx: 0,
+      filteredType: 'all',
+    };
   }
 
-  handleClick(event) {
-    this.setState((previous, props) => {
-      const lastIdx = props.pokemons.length - 1;
-      let nextIdx = previous.idx + 1;
-      if (nextIdx > lastIdx) nextIdx = 0;
+  filterPokemons(filteredType) {
+    this.setState({ filteredType, idx: 0 }); // { filteredType: filteredType, idx: 0 }
+  }
 
-      return { idx: nextIdx };
+  nextPokemon(numberOfPokemons) {
+    this.setState((state) => ({
+      idx: (state.idx + 1) % numberOfPokemons,
+    }));
+  }
+
+  fetchFilteredPokemons() {
+    const { pokemons } = this.props;
+    const { filteredType } = this.state;
+
+    return pokemons.filter(({ type }) => {
+      if (filteredType === 'all') return true;
+      return type === filteredType;
     });
   }
 
-  render() {
+  fetchPokemonTypes() {
     const { pokemons } = this.props;
-    const pokemon = pokemons[this.state.idx];
+
+    return [...new Set(pokemons.reduce((types, { type }) => [...types, type], []))];
+  }
+
+  render() {
+    const filteredPokemons = this.fetchFilteredPokemons();
+    const pokemonTypes = this.fetchPokemonTypes();
+    const pokemon = filteredPokemons[this.state.idx];
 
     return (
       <div className="pokedex">
-        <Pokemon key={pokemon.id} pokemon={pokemon} />
-        <button onClick={this.handleClick}>Next</button>
+        <Pokemon pokemon={ pokemon } />
+        <div className="pokedex-buttons-panel">
+          <Button
+            onClick={() => this.filterPokemons('all')}
+            className="filter-button"
+          >
+            All
+          </Button>
+          {pokemonTypes.map(type => (
+            <Button
+              key={ type }
+              onClick={() => this.filterPokemons(type)}
+              className="filter-button"
+            >
+              { type }
+            </Button>
+          ))}
+        </div>
+        <Button
+          className="pokedex-button"
+          onClick={() => this.nextPokemon(filteredPokemons.length)}
+          disabled={ filteredPokemons.length <= 1 }
+        >
+          Next
+        </Button>
       </div>
     );
   }

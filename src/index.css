@@ -7,7 +7,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.pokemon {
+.pokemon, .controls {
   display: flex;
   align-items: center;
   justify-content: space-around;
@@ -16,6 +16,10 @@ body {
   margin: 10px 10px;
   border: 1px gray solid;
   border-radius: 10px;
+}
+
+.controls {
+  border: none;
 }
 
 .pokedex {
